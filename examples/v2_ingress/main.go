@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"code.cloudfoundry.org/go-loggregator"
@@ -21,7 +22,7 @@ func main() {
 
 	client, err := loggregator.NewIngressClient(
 		tlsConfig,
-		loggregator.WithAddr("localhost:3458"),
+		loggregator.WithAddr(os.Getenv("LOGGREGATOR_URL")),
 	)
 
 	if err != nil {
@@ -41,16 +42,20 @@ func main() {
 
 	for i := 0; i < 50; i++ {
 		client.EmitLog("some log goes here",
-			loggregator.WithSourceInfo("v2-example-source-id", "platform", "v2-example-source-instance"),
+			loggregator.WithSourceInfo("something", "platform", "v2-example-source-instance"),
 		)
 
 		time.Sleep(10 * time.Millisecond)
 	}
 
-	startTime := time.Now()
 	for i := 0; i < 5; i++ {
-		client.EmitTimer("loop_times", startTime, time.Now())
+		client.EmitGauge(
+			loggregator.WithGaugeValue("foo", float64(i), "ms"),
+			loggregator.WithGaugeSourceInfo("something", "0"),
+		)
 	}
 
 	client.CloseSend()
+	sleepInSeconds, _ := strconv.Atoi(os.Getenv("SLEEP_IN_SECONDS"))
+	time.Sleep(time.Duration(sleepInSeconds) * time.Second)
 }
