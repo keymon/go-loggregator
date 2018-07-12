@@ -41,16 +41,19 @@ func main() {
 
 	for i := 0; i < 50; i++ {
 		client.EmitLog("some log goes here",
-			loggregator.WithSourceInfo("v2-example-source-id", "platform", "v2-example-source-instance"),
+			loggregator.WithSourceInfo(os.Args[1], "platform", "v2-example-source-instance"),
 		)
 
 		time.Sleep(10 * time.Millisecond)
 	}
 
-	startTime := time.Now()
 	for i := 0; i < 5; i++ {
-		client.EmitTimer("loop_times", startTime, time.Now())
+		client.EmitGauge(
+			loggregator.WithGaugeValue("foo", float64(i), "ms"),
+			loggregator.WithGaugeSourceInfo(os.Args[1], "0"),
+		)
 	}
 
 	client.CloseSend()
+	time.Sleep(2)
 }
