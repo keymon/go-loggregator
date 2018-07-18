@@ -17,7 +17,7 @@ func TestV2Ingress(t *testing.T) {
 	BeforeSuite(func() {
 		var err error
 
-		examplePath, err = gexec.Build("github.com/cloudfoundry/go-loggregator/examples/v2_ingress")
+		examplePath, err = gexec.Build("code.cloudfoundry.org/go-loggregator/examples/v2_ingress")
 		Expect(err).ShouldNot(HaveOccurred())
 	})
 
